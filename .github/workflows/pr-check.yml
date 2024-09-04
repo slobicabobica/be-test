@@ -14,10 +14,10 @@ jobs:
         run: |
           if git diff ${{ github.event.before }} ${{ github.sha }} -- README.md | grep -q '^[-+]'; then
             echo "README.md has changed"
-            echo "::set-output name=readme_changed::true"
+            echo "name=readme_changed::true" >> $env:GITHUB_OUTPUT
           else
             echo "README.md has not changed"
-            echo "::set-output name=readme_changed::false"
+            echo "name=readme_changed::false" >> $env:GITHUB_OUTPUT
           fi
     
       - name: Trigger Client Repo Schema Update
