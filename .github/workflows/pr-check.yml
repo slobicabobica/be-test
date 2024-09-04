@@ -59,7 +59,7 @@ jobs:
               "description": "Client compatibility check is running..."
             }'
       - name: Set Success Status on Backend PR
-        if: env.readme_changed == 'true'
+        if: env.readme_changed == 'false'
         run: |
             curl -L \
             -X POST \
