@@ -36,6 +36,7 @@ jobs:
           fi
     
       - name: Trigger Client Repo Schema Update
+        if: env.readme_changed == 'true'
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.CLIENT_REPO_TOKEN }}" \
@@ -44,7 +45,7 @@ jobs:
             -d '{"event_type": "schema-change", "client_payload": {}}'
 
       - name: Set Pending Status on Backend PR
-        if: steps.check_readme.outputs.readme_changed == 'true'
+        if: env.readme_changed == 'true'
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -55,4 +56,8 @@ jobs:
               "context": "Client Compatibility Check",
               "description": "Client compatibility check is running..."
             }'
+       # Skip action if README.md content didn't change
+      - name: Skip action if README.md content didn't change
+        if: env.readme_changed == 'false'
+        run: echo "Content of README.md has not changed. No actions required."     
 
