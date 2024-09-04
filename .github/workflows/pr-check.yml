@@ -3,7 +3,7 @@ name: Notify Client on Schema Change
 on:
   push:
     paths:
-      - 'path/to/schema/**/*' # Update this to the path where your schema is stored
+      - 'README.md' # Update this to the path where your schema is stored
 
 jobs:
   notify-client:
