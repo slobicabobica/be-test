@@ -9,15 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if README.md has changed
+      - name: Check if README.md content has changed
         id: check_readme
         run: |
           if git diff ${{ github.event.before }} ${{ github.sha }} -- README.md | grep -q '^[-+]'; then
             echo "README.md has changed"
-            echo "name=readme_changed::true" >> $env:GITHUB_OUTPUT
+            echo "readme_changed=true" >> $GITHUB_ENV
           else
             echo "README.md has not changed"
-            echo "name=readme_changed::false" >> $env:GITHUB_OUTPUT
+            echo "readme_changed=false" >> $GITHUB_ENV
           fi
     
       - name: Trigger Client Repo Schema Update
