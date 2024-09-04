@@ -4,7 +4,9 @@ on:
   push:
     paths:
       - 'README.md' # Update this to the path where your schema is stored
-
+  pull_request:
+    types: [opened, synchronize]
+    
 jobs:
   notify-client:
     runs-on: ubuntu-latest
