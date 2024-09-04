@@ -29,7 +29,7 @@ jobs:
             -d '{"event_type": "schema-change", "client_payload": {}}'
 
       - name: Set Pending Status on Backend PR
-        if: github.event_name == 'pull_request' && steps.check_readme.outputs.readme_changed == 'true'
+        if: steps.check_readme.outputs.readme_changed == 'true'
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -40,6 +40,4 @@ jobs:
               "context": "Client Compatibility Check",
               "description": "Client compatibility check is running..."
             }'
-      - name: Do something else if it's not a pull request
-        if: github.event_name == 'pull_request'
-        run: echo "This is not a pull request. ${{ github.event_name }}"
+
