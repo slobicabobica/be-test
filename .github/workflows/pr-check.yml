@@ -32,4 +32,4 @@ jobs:
             }'
       - name: Do something else if it's not a pull request
         if: github.event_name != 'pull_request'
-        run: echo "This is not a pull request. ${{ github.event_name }}""
+        run: echo "This is not a pull request. ${{ github.event_name }}"
