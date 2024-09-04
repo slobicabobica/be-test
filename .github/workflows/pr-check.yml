@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2  # Fetch only the last two commits for comparison
+      # Log the current and previous commit SHAs for debugging purposes
+      - name: Log SHAs
+        run: |
+          echo "Previous commit SHA: ${{ github.event.before }}"
+          echo "Current commit SHA: ${{ github.sha }}"
       - name: Check if README.md content has changed
         id: check_readme
         run: |
