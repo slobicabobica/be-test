@@ -48,7 +48,7 @@ jobs:
             -d '{"event_type": "schema-change", "client_payload": { 
             "branch_name": "${{ env.BE_BRANCH }}",
             "pr_number": "${{ github.event.pull_request.number }}",
-            "commit_sha": "${{ github.sha }}",
+            "commit_sha": "${{ github.sha }}"
             }}'
 
       - name: Set Pending Status on Backend PR
