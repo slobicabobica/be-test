@@ -45,7 +45,11 @@ jobs:
             -H "Authorization: token ${{ secrets.CLIENT_REPO_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/slobicabobica/fe-test/dispatches \
-            -d '{"event_type": "schema-change", "client_payload": {  "branch_name": "${{ env.BE_BRANCH }}" }}'
+            -d '{"event_type": "schema-change", "client_payload": { 
+            "branch_name": "${{ env.BE_BRANCH }}",
+            "pr_number": "${{ github.event.pull_request.number }}",
+            "commit_sha": "${{ github.sha }}",
+            }}'
 
       - name: Set Pending Status on Backend PR
         if: env.readme_changed == 'true'
