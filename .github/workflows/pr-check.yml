@@ -36,7 +36,7 @@ jobs:
           fi
        # Get the current branch name from the backend
       - name: Get Branch Name
-        run: echo "BE_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+        run: echo "BE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
         
       - name: Trigger Client Repo Schema Update
         if: env.readme_changed == 'true'
