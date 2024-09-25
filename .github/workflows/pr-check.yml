@@ -23,7 +23,8 @@ jobs:
           echo "main_commit=$MAIN_COMMIT" >> $GITHUB_ENV
 
       - name: Log Current Commit SHA
-        run: echo "Current commit SHA: ${{ github.sha }}"
+        run: |
+          echo "Current commit SHA: ${{ github.sha }}"
 
       - name: Check if schema.graphqls content has changed
         id: check_schema
