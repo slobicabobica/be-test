@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository with full history
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2  # Fetch only the last two commits for comparison
 
@@ -40,24 +40,11 @@ jobs:
       - name: Get Branch Name
         run: echo "BE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
 
-      - name: Trigger Client Repo Schema Update
-        if: env.schema_changed == 'true'
-        run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.CLIENT_REPO_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository_owner }}/fe-test/dispatches \
-            -d '{"event_type": "schema-change", "client_payload": { 
-            "branch_name": "${{ env.BE_BRANCH }}",
-            "pr_number": "${{ github.event.pull_request.number }}",
-            "commit_sha": "${{ github.sha }}"
-            }}'
-
       - name: Add Pending Label to PR
         if: env.schema_changed == 'true'
         run: |
           curl -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             -d '{
               "labels": ["Client Compatibility Check Pending"]
@@ -68,9 +55,49 @@ jobs:
         if: env.schema_changed == 'false'
         run: |
           curl -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             -d '{
-              "labels": ["Client Compatibility Check Passed"]
+                 "labels": ["Client Compatibility Check Passed"]
             }' \
             https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels
+      
+      - name: Trigger Client Repo Schema Update
+        if: env.schema_changed == 'true'
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.CLIENT_REPO_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository_owner }}/fe-tes/dispatches \
+            -d '{"event_type": "schema-change", "client_payload": { 
+            "branch_name": "${{ env.BE_BRANCH }}",
+            "pr_number": "${{ github.event.pull_request.number }}",
+            "commit_sha": "${{ github.sha }}"
+            }}'
+      - name: Set Pending Status on Backend PR
+        if: env.readme_changed == 'true' && env.USE_STATUS_UPDATE == 'true'
+        run: |
+            curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -d  '{
+              "state": "pending",
+              "context": "Client Compatibility Check",
+              "description": "Client compatibility check is running..."
+            }' \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
+
+      - name: Set Success Status on Backend PR
+        if: env.readme_changed == 'false' && env.USE_STATUS_UPDATE == 'true'
+        run: |
+            curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -d  '{
+              "state": "success",
+              "context": "Client Compatibility Check",
+              "description": "Client compatibility check passed."
+            }' \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}      
