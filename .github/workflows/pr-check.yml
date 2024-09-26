@@ -24,7 +24,7 @@ jobs:
 
       - name: Log Current Commit SHA
         run: |
-          echo "Current commit SHA: ${{ github.sha }}"
+          echo "Current commit SHA: ${{ github.sha }} ${{vars.USE_STATUS_UPDATE}} ${{toJSON(vars) }}"
 
       - name: Check if schema.graphqls content has changed
         id: check_schema
