@@ -75,7 +75,7 @@ jobs:
             "commit_sha": "${{ github.sha }}"
             }}'
       - name: Set Pending Status on Backend PR
-        if: env.readme_changed == 'true' && ${{ vars.USE_STATUS_UPDATE }} == 'true'
+        if: env.readme_changed == 'true' && vars.USE_STATUS_UPDATE == 'true'
         run: |
             curl -L \
             -X POST \
@@ -89,7 +89,7 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
 
       - name: Set Success Status on Backend PR
-        if: env.readme_changed == 'false' && ${{ vars.USE_STATUS_UPDATE }} == 'true'
+        if: env.readme_changed == 'false' && vars.USE_STATUS_UPDATE == 'true'
         run: |
             curl -L \
             -X POST \
