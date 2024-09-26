@@ -76,7 +76,8 @@ jobs:
             }}'
       - name: Set Pending Status on Backend PR
         if: |
-          env.readme_changed == 'true' && vars.USE_STATUS_UPDATE == 'true'
+          (env.readme_changed == 'true') && 
+          (vars.USE_STATUS_UPDATE == 'true')
         run: |
             curl -L \
             -X POST \
@@ -91,7 +92,8 @@ jobs:
 
       - name: Set Success Status on Backend PR
         if: |
-          env.readme_changed == 'false' && vars.USE_STATUS_UPDATE == 'true'
+          (env.readme_changed == 'false') &&
+          (vars.USE_STATUS_UPDATE == 'true')
         run: |
             curl -L \
             -X POST \
