@@ -21,7 +21,7 @@ jobs:
           base_commit=$(git merge-base origin/main HEAD)
           echo "Initial commit before push: $base_commit"
           echo "base_commit=$base_commit" >> $GITHUB_ENV
-    
+
       - name: Check if schema.graphqls content has changed across all commits in the push
         id: check_schema_in_push
         run: |
@@ -32,7 +32,6 @@ jobs:
             echo "schema.graphqls has not changed across the series of commits"
             echo "schema_changed=false" >> $GITHUB_ENV
           fi
-
       - name: Get Branch Name
         run: echo "BE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
 
