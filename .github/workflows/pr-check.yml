@@ -61,8 +61,7 @@ jobs:
 
       - name: Add Success Label to PR
         if: env.schema_changed == 'false'
-        run: |
-          run: |
+        run: |          
           # Get all labels from the PR
           labels=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
