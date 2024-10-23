@@ -62,13 +62,27 @@ jobs:
       - name: Add Success Label to PR
         if: env.schema_changed == 'false'
         run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          run: |
+          # Get all labels from the PR
+          labels=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
-            -d '{
-                 "labels": ["Client Compatibility Check Passed"]
-            }' \
-            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }} | jq -r '.labels | .[].name')
+          
+          # Check if there are schema changes between main and the current PR
+          schema_changed=$(git diff origin/main HEAD -- cdk/assets/schema.graphqls | grep -q '^[-+]' && echo "true" || echo "false")
+          
+          # Only set success if no changes in schema and no pending/failure labels
+          if [[ "$labels" != *"Client Compatibility Check Pending"* ]] && \
+            [[ "$labels" != *"Client Compatibility Check Failure"* ]] && \
+            [[ "$schema_changed" == "false" ]]; then
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github+json" \
+              -d '{
+                  "labels": ["Client Compatibility Check Passed"]
+              }' \
+              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels
+          fi    
       
       - name: Trigger Client Repo Schema Update
         if: env.schema_changed == 'true'
