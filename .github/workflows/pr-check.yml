@@ -13,27 +13,23 @@ jobs:
       - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # Fetch only the last two commits for comparison
+          fetch-depth: 10  # Fetch only the last two commits for comparison
 
-      - name: Fetch latest commit from main branch
+      - name: Fetch the commit before the push started
+        id: fetch_initial_commit
         run: |
-          git fetch origin main
-          MAIN_COMMIT=$(git rev-parse origin/main)
-          echo "Main branch commit: $MAIN_COMMIT"
-          echo "main_commit=$MAIN_COMMIT" >> $GITHUB_ENV
-
-      - name: Log Current Commit SHA
+          base_commit=$(git merge-base origin/main HEAD)
+          echo "Initial commit before push: $base_commit"
+          echo "base_commit=$base_commit" >> $GITHUB_ENV
+      
+      - name: Check if schema.graphqls content has changed across all commits in the push
+        id: check_schema_in_push
         run: |
-          echo "Current commit SHA: ${{ github.sha }} ${{vars.USE_STATUS_UPDATE}} ${{toJSON(vars) }}"
-
-      - name: Check if schema.graphqls content has changed
-        id: check_schema
-        run: |
-          if git diff ${{ env.main_commit }} ${{ github.sha }} -- cdk/assets/schema.graphqls | grep -q '^[-+]'; then
-            echo "schema.graphqls has changed"
+          if git diff ${{ env.base_commit }} ${{ github.sha }} -- cdk/assets/schema.graphqls | grep -q '^[-+]'; then
+            echo "schema.graphqls has changed across the series of commits"
             echo "schema_changed=true" >> $GITHUB_ENV
           else
-            echo "schema.graphqls has not changed"
+            echo "schema.graphqls has not changed across the series of commits"
             echo "schema_changed=false" >> $GITHUB_ENV
           fi
 
