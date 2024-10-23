@@ -15,21 +15,34 @@ jobs:
         with:
           fetch-depth: 0 
 
-      - name: Fetch the commit before the push started
-        id: fetch_initial_commit
+      # Check if this workflow is triggered by opening a PR or by synchronizing (adding commits)
+      - name: Determine PR event type
+        id: determine_event
+        run: echo "event_action=${{ github.event.action }}" >> $GITHUB_ENV
+
+      # Fetch the appropriate base commit for comparison
+      - name: Fetch Base Commit
+        id: fetch_base_commit
         run: |
-          base_commit=$(git merge-base origin/main HEAD)
-          echo "Initial commit before push: $base_commit"
+          if [ "${{ env.event_action }}" = "opened" ]; then
+            # If PR is opened, find the common base commit with the main branch
+            base_commit=$(git merge-base origin/main HEAD)
+          else
+            # If PR is updated (synchronized), use the previous commit in this push
+            base_commit=${{ github.event.before }}
+          fi
+          echo "Base commit for comparison: $base_commit"
           echo "base_commit=$base_commit" >> $GITHUB_ENV
 
-      - name: Check if schema.graphqls content has changed across all commits in the push
+      # Check if schema.graphqls content has changed
+      - name: Check if schema.graphqls content has changed
         id: check_schema_in_push
         run: |
           if git diff ${{ env.base_commit }} HEAD -- cdk/assets/schema.graphqls | grep -q '^[-+]'; then
-            echo "schema.graphqls has changed across the series of commits"
+            echo "schema.graphqls has changed"
             echo "schema_changed=true" >> $GITHUB_ENV
           else
-            echo "schema.graphqls has not changed across the series of commits"
+            echo "schema.graphqls has not changed"
             echo "schema_changed=false" >> $GITHUB_ENV
           fi
       - name: Get Branch Name
