@@ -21,11 +21,11 @@ jobs:
           base_commit=$(git merge-base origin/main HEAD)
           echo "Initial commit before push: $base_commit"
           echo "base_commit=$base_commit" >> $GITHUB_ENV
-      
+    
       - name: Check if schema.graphqls content has changed across all commits in the push
         id: check_schema_in_push
         run: |
-          if git diff ${{ env.base_commit }} ${{ github.sha }} -- cdk/assets/schema.graphqls | grep -q '^[-+]'; then
+          if git diff ${{ env.base_commit }} HEAD -- cdk/assets/schema.graphqls | grep -q '^[-+]'; then
             echo "schema.graphqls has changed across the series of commits"
             echo "schema_changed=true" >> $GITHUB_ENV
           else
